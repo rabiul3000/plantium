@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+@plugin "daisyui" {
+	themes: all;
+}
+
+a.active {
+	background-color: oklch(52.7% 0.154 150.069);
+	color: white;
+}
+
+.loginContainer {
+	background-image: url('./assets/login_bg.jpg');
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
