@@ -8,7 +8,6 @@ import MyPlants from "../pages/MyPlants/MyPlants.jsx";
 import AddPlant from "../pages/AddPlant/AddPlant.jsx";
 import AllPlants from "../pages/AllPlants/AllPlants.jsx";
 import PrivateRoute from "../components/PrivateRoute/PrivateRoute.jsx";
-import api from "../api/api.js";
 import LoadingPage from "../pages/Loading/LoadingPage.jsx";
 import PlantDetail from "../pages/PlantDetail/PlantDetail.jsx";
 import UpdatePlant from "../pages/UpdatePlant/UpdatePlant.jsx";
@@ -16,6 +15,7 @@ import About from "../pages/About/About.jsx";
 import ShowError from "../pages/ShowError/ShowError.jsx";
 import Support from "../pages/Support/Support.jsx";
 import Contact from "../pages/Contact/Contact.jsx";
+import Dashboard from "../pages/Dashboard/Dashboard.jsx";
 // import axios from 'axios'
 
 const router = createBrowserRouter([
@@ -29,10 +29,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/all_plants",
-        loader: () => fetch(`${api}/plants`).then((res) => res.json()),
         Component: AllPlants,
-        hydrateFallbackElement: <LoadingPage />,
-        errorElement: <ShowError />,
       },
       {
         path: "/add_plant",
@@ -45,14 +42,20 @@ const router = createBrowserRouter([
 
       {
         path: "/plant/:id",
-        loader: ({ params }) =>
-          fetch(`${api}/plant/${params.id}`).then((res) => res.json()),
         element: (
           <PrivateRoute>
             <PlantDetail />
           </PrivateRoute>
         ),
         hydrateFallbackElement: <LoadingPage />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
       },
 
       {

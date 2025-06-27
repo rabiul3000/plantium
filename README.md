@@ -40,5 +40,5 @@ Plantium is a modern plant tracking and management web application built with **
 1. **Clone the repository**:
 
 ```bash
-git clone https://github.com/yourusername/plantium.git
+git clone https://github.com/rabiul3000/plantium.git
 cd plantium/client

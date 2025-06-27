@@ -45,6 +45,11 @@ const Navbar = () => {
 			path: '/contact',
 			title: 'Contact',
 		},
+		{
+			name: 'Dashboard',
+			path: '/dashboard',
+			title: 'Dashboard',
+		},
 	];
 
 	const handleLogout = () => {

@@ -1,146 +1,87 @@
-import React, { useContext, useEffect, useState } from 'react';
-import AuthContext from '../../contexts/AuthContext';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import axios from 'axios';
 import api from '../../api/api';
 import LoadingPage from '../Loading/LoadingPage';
-import { useNavigate } from 'react-router';
 import { ErrorAlert } from '../../utils/Alerts';
 
-const MyPlants = ({ limit }) => {
-	const { user } = useContext(AuthContext);
+const MyPlants = () => {
 	const [plants, setPlants] = useState([]);
-	const [loading, setLoading] = useState('false');
+	const [loading, setLoading] = useState(true);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		setLoading(true);
-		const loadData = () => {
-			fetch(`${api}/my_plants/${user?.email}`)
-				.then((res) => res.json())
-				.then(({ myPlants }) => {
-					setPlants(myPlants);
-					setLoading(false);
-				})
-				.catch((err) => {
-					setLoading(false);
-					ErrorAlert(err.message);
-				});
-		};
-
-		const loadDataWithLimit = () => {
-			fetch(`${api}/last_plants/${user?.email}`)
-				.then((res) => res.json())
-				.then(({ myPlants }) => {
-					setPlants(myPlants);
-					setLoading(false);
-				})
-				.catch((err) => {
-					setLoading(false);
-					ErrorAlert(err.message);
-				});
-		};
-		if (limit) {
-			loadDataWithLimit();
-		} else {
-			loadData();
-		}
+		axios
+			.get(`${api}/plants`)
+			.then((res) => {
+				const newest = res.data.slice(0, 5); // take first 5 plants
+				setPlants(newest);
+				setLoading(false);
+			})
+			.catch((err) => {
+				setLoading(false);
+				ErrorAlert(err.message);
+			});
 	}, []);
-
-	const navigate = useNavigate();
 
 	return (
 		<div>
 			{loading ? (
 				<LoadingPage />
 			) : (
-				<div className='grid grid-cols-1 lg:grid-cols-3 gap-4 p-8'>
+				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-8'>
 					{plants.length ? (
 						plants.map(
 							({
-								careLevel,
-								category,
-								description,
-								email,
-								image,
-								lastWateringDate,
-								name,
-								nextWateringDate,
-								username,
-								wateringFrequency,
-								health,
 								_id,
+								image,
+								name,
+								description,
+								health,
+								category,
+								careLevel,
+								lastWateringDate,
 							}) => (
 								<div
 									key={_id}
-									className='hero-content flex-col lg:flex-row-reverse border border-gray-200 rounded-lg shadow'
+									className='card w-full bg-base-100 shadow-md hover:shadow-xl transition-all'
 								>
-									<img src={image} className='max-w-sm rounded-lg shadow-2xl' />
-									<div>
-										<h1 className='text-2xl font-bold text-green-800 capitalize'>
+									<figure className='h-48 overflow-hidden'>
+										<img src={image} alt={name} className='w-full h-full object-cover' />
+									</figure>
+									<div className='card-body'>
+										<h2 className='card-title capitalize text-green-700 text-xl'>
 											{name}
-										</h1>
-										<p className='pt-6  text-slate-700 '>{description}</p>
-										<p className='py-2 text-sm capitalize font-bold text-slate-700'>
-											{' '}
-											Health:{' '}
-											<span
-												className='badge'
-												style={{
-													color:
-														health === 'good'
-															? 'green'
-															: health === 'bad'
-															? 'yellowgreen'
-															: 'tomato',
-												}}
-											>
-												{health}
-											</span>
+										</h2>
+										<p className='text-sm text-gray-600 line-clamp-2'>
+											{description}
 										</p>
 
-										<div className='text-sm capitalize font-semibold text-slate-700 flex flex-col gap-2'>
-											<p> Category: {category} </p>
-											<p> CareLevel: {careLevel} </p>
-											<p> Last Water: {lastWateringDate} </p>
-											<p> Next Water day: {nextWateringDate} </p>
-											<p> Watering Frequency: {wateringFrequency} Days</p>
-											<button
-												onClick={() =>
-													navigate(`/update_plant/${_id}`, {
-														state: {
-															careLevel,
-															category,
-															description,
-															email,
-															image,
-															lastWateringDate,
-															name,
-															nextWateringDate,
-															username,
-															wateringFrequency,
-															health,
-															_id,
-														},
-													})
-												}
-												to={`/update_plant/${_id}`}
-												className='btn btn-sm btn-primary btn-soft'
-											>
-												Update Plant
-											</button>
+										<div className='text-sm text-gray-700 mt-2'>
+											<p><strong>Category:</strong> {category}</p>
+											<p><strong>Care Level:</strong> {careLevel}</p>
+											<p><strong>Health:</strong>{' '}
+												<span className='badge badge-outline'>{health}</span>
+											</p>
+											<p><strong>Last Watered:</strong> {lastWateringDate}</p>
 										</div>
 
-										<div className='text-xs text-gray-500 mt-4 '>
-											<p>
-												Added by {username} Email: {email}
-											</p>
+										<div className='card-actions mt-4 justify-end'>
+											<button
+												onClick={() => navigate(`/plant/${_id}`)}
+												className='btn btn-sm btn-primary'
+											>
+												See Details
+											</button>
 										</div>
 									</div>
 								</div>
 							)
 						)
 					) : (
-						<div className='col-span-3  text-center'>
-							<p className='text-3xl'>No Data Yet!</p>
-							<p>Add a plant to view</p>
+						<div className='col-span-4 text-center'>
+							<p className='text-xl'>No plants found.</p>
 						</div>
 					)}
 				</div>
